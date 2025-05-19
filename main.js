@@ -9,7 +9,10 @@ const pty = require('node-pty');
 const store = new Store();
 
 // Keep a global reference of the window object to prevent garbage collection
-let mainWindow;
+let mainWindow = null;
+
+// Check for single instance and prevent multiple application instances
+const gotTheLock = app.requestSingleInstanceLock();
 
 // Detect development mode
 const isDevelopment = process.env.NODE_ENV === 'development' || !app.isPackaged;
@@ -87,7 +90,7 @@ function createWindow() {
     minHeight: 600,
     backgroundColor: '#282c34',
     center: !bounds.x && !bounds.y, // Center only if no position stored
-    alwaysOnTop: true, // Keep window visible
+    alwaysOnTop: false, // Don't keep window always on top as it consumes resources
     skipTaskbar: process.platform !== 'darwin', // Hide from taskbar except on macOS
     webPreferences: {
       nodeIntegration: false,
@@ -163,6 +166,19 @@ function createWindow() {
   // Handle window closing
   mainWindow.on('closed', () => {
     logDebug('Window', 'Window closed');
+    // Clean up all terminal sessions when window is closed
+    Object.keys(terminals).forEach(id => {
+      try {
+        if (terminals[id] && terminals[id].pty) {
+          terminals[id].pty.kill();
+          logDebug('Terminal', `Killed terminal session ${id} during window close`);
+        }
+      } catch (error) {
+        logDebug('Terminal', `Error killing terminal session ${id}:`, error);
+      }
+    });
+    // Clear all terminals
+    Object.keys(terminals).forEach(key => delete terminals[key]);
     mainWindow = null;
   });
 
@@ -174,25 +190,71 @@ function createWindow() {
 }
 
 // Create window when Electron has finished initialization
-app.whenReady().then(() => {
-  logDebug('App', 'Application ready, creating window');
-  createWindow();
-
-  app.on('activate', () => {
-    // On macOS, recreate a window when the dock icon is clicked
-    if (BrowserWindow.getAllWindows().length === 0) {
-      logDebug('App', 'Activating application, creating new window');
-      createWindow();
+if (!gotTheLock) {
+  logDebug('App', 'Another instance is already running, quitting');
+  app.quit();
+} else {
+  // Handle second instance launch
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    logDebug('App', 'Second instance detected, focusing existing window');
+    // Someone tried to run a second instance, focus our window instead
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+      mainWindow.focus();
+      mainWindow.show();
     }
   });
-});
+
+  // Create window when Electron has finished initialization
+  app.whenReady().then(() => {
+    logDebug('App', 'Application ready, creating window');
+    createWindow();
+
+    app.on('activate', () => {
+      // On macOS, recreate a window when the dock icon is clicked
+      if (BrowserWindow.getAllWindows().length === 0) {
+        logDebug('App', 'Activating application, creating new window');
+        createWindow();
+      }
+    });
+  });
+}
 
 // Quit when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     logDebug('App', 'All windows closed, quitting application');
+    // Ensure all terminal processes are killed
+    Object.keys(terminals).forEach(id => {
+      try {
+        if (terminals[id] && terminals[id].pty) {
+          terminals[id].pty.kill();
+          logDebug('Terminal', `Killed terminal session ${id} during app quit`);
+        }
+      } catch (error) {
+        logDebug('Terminal', `Error killing terminal session ${id}:`, error);
+      }
+    });
     app.quit();
   }
+});
+
+// Ensure clean exit
+app.on('before-quit', () => {
+  logDebug('App', 'Application quitting, cleaning up resources');
+  // Force kill any remaining terminal processes
+  Object.keys(terminals).forEach(id => {
+    try {
+      if (terminals[id] && terminals[id].pty) {
+        terminals[id].pty.kill();
+        logDebug('Terminal', `Killed terminal session ${id} during app quit`);
+      }
+    } catch (error) {
+      logDebug('Terminal', `Error killing terminal session ${id}:`, error);
+    }
+  });
 });
 
 // Handle window control events with enhanced logging
@@ -243,12 +305,18 @@ ipcMain.handle('terminal:create', (event, { id, rows, cols }) => {
     // Set up data handler for this terminal
     const ptyProcess = terminals[sessionId].pty;
     
-    ptyProcess.onData((data) => {
+    // Store the data handler reference so we can remove it later if needed
+    const dataHandler = (data) => {
       // Make sure window is not destroyed before sending
       if (!event.sender.isDestroyed()) {
         event.sender.send('terminal:data', { id: sessionId, data });
       }
-    });
+    };
+    
+    ptyProcess.onData(dataHandler);
+    
+    // Store the handler reference for cleanup
+    terminals[sessionId].dataHandler = dataHandler;
     
     return { success: true, id: sessionId };
   } catch (error) {
@@ -296,7 +364,18 @@ ipcMain.handle('terminal:close', (event, { id }) => {
     }
     
     logDebug('Terminal', `Closing terminal session: ${id}`);
+    
+    // Ensure the process is properly terminated
     terminals[id].pty.kill();
+    
+    // Remove the data handler explicitly to prevent memory leaks
+    if (terminals[id].dataHandler) {
+      // Note: node-pty doesn't have a direct way to remove listeners,
+      // but we're making the reference available for garbage collection
+      terminals[id].dataHandler = null;
+    }
+    
+    // Clean up the terminal reference
     delete terminals[id];
     return { success: true };
   } catch (error) {
@@ -305,8 +384,59 @@ ipcMain.handle('terminal:close', (event, { id }) => {
   }
 });
 
-// Handle GPU acceleration
-app.commandLine.appendSwitch('enable-gpu-rasterization');
-app.commandLine.appendSwitch('enable-zero-copy');
-app.commandLine.appendSwitch('enable-accelerated-video-decode');
+// Handle GPU acceleration - only enable if needed to prevent unnecessary resource usage
+function setupHardwareAcceleration() {
+  // Check if we should enable hardware acceleration
+  const disableAcceleration = store.get('settings.disableHardwareAcceleration', false);
+  
+  if (disableAcceleration) {
+    logDebug('Hardware', 'Hardware acceleration disabled by user setting');
+    app.disableHardwareAcceleration();
+  } else {
+    // Selectively enable hardware acceleration features based on capability
+    if (process.platform !== 'linux') { // Linux often has issues with GPU acceleration
+      app.commandLine.appendSwitch('enable-gpu-rasterization');
+      logDebug('Hardware', 'Enabled GPU rasterization');
+    }
+    
+    // Don't enable these by default as they can cause high CPU usage
+    const enableAdvancedAcceleration = store.get('settings.enableAdvancedAcceleration', false);
+    if (enableAdvancedAcceleration) {
+      app.commandLine.appendSwitch('enable-zero-copy');
+      app.commandLine.appendSwitch('enable-accelerated-video-decode');
+      logDebug('Hardware', 'Enabled advanced hardware acceleration features');
+    }
+  }
+}
 
+// Setup hardware acceleration before app is ready
+setupHardwareAcceleration();
+
+// Cleanup function to ensure all resources are properly released
+function cleanupAllResources() {
+  logDebug('Cleanup', 'Performing final resource cleanup');
+  
+  // Close and cleanup any terminal sessions
+  Object.keys(terminals).forEach(id => {
+    try {
+      if (terminals[id] && terminals[id].pty) {
+        terminals[id].pty.kill();
+      }
+    } catch (error) {
+      console.error(`Failed to clean up terminal ${id}:`, error);
+    }
+  });
+  
+  // Clear the terminals object
+  Object.keys(terminals).forEach(key => delete terminals[key]);
+}
+
+// Register the cleanup function for app exit
+process.on('exit', cleanupAllResources);
+
+// Handle uncaught exceptions gracefully
+process.on('uncaughtException', (error) => {
+  logDebug('Error', 'Uncaught exception:', error);
+  cleanupAllResources();
+  // Let the process exit naturally after cleanup
+});
