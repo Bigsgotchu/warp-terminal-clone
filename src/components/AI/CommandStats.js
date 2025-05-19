@@ -12,7 +12,12 @@ import {
   Empty,
   Space,
   Badge,
-  Divider
+  Divider,
+  Select,
+  Input,
+  DatePicker,
+  Modal,
+  Radio
 } from 'antd';
 import {
   BarChartOutlined,
@@ -24,19 +29,33 @@ import {
   CheckCircleOutlined,
   WarningOutlined,
   ArrowRightOutlined,
-  CodeOutlined
+  CodeOutlined,
+  ExportOutlined,
+  FilterOutlined,
+  SearchOutlined,
+  PieChartOutlined,
+  LineChartOutlined,
+  CalendarOutlined,
+  SaveOutlined
 } from '@ant-design/icons';
 import {
   selectCommandHistory,
   selectCommandPatterns,
   selectAIEnabled,
   analyzeCommandPatterns,
-  clearCommandStats
+  clearCommandStats,
+  setCurrentTerminalInput
 } from '../../features/ai/aiSlice';
+import { Chart, registerables } from 'chart.js';
+import { Pie, Bar } from 'react-chartjs-2';
 import './CommandStats.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
+const { RangePicker } = DatePicker;
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 /**
  * @typedef {Object} CommandStat
@@ -80,6 +99,16 @@ const CommandStats = ({ isVisible = false, onClose }) => {
   const [commandStats, setCommandStats] = useState([]);
   const [optimizations, setOptimizations] = useState([]);
   
+  // New state variables for enhanced features
+  const [timeFilter, setTimeFilter] = useState('all'); // all, week, month
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredStats, setFilteredStats] = useState([]);
+  const [filteredPatterns, setFilteredPatterns] = useState([]);
+  const [filteredOptimizations, setFilteredOptimizations] = useState([]);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+  const [exportFormat, setExportFormat] = useState('json');
+  const [chartType, setChartType] = useState('pie'); // pie, bar
+  
   // Focus management - focus container when it becomes visible
   useEffect(() => {
     if (isVisible && containerRef.current) {
@@ -116,6 +145,60 @@ const CommandStats = ({ isVisible = false, onClose }) => {
       }
     }
   }, [commandHistory, commandPatterns, dispatch]);
+  
+  // Apply filtering when filter settings or command data changes
+  useEffect(() => {
+    // Apply time filter
+    let timeFilteredHistory = [...commandHistory];
+    const now = new Date();
+    
+    if (timeFilter === 'week') {
+      // Filter to last 7 days
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      timeFilteredHistory = commandHistory.filter(cmd => {
+        // Assuming command history items have a timestamp property
+        const cmdDate = new Date(cmd.timestamp || now);
+        return cmdDate >= weekAgo;
+      });
+    } else if (timeFilter === 'month') {
+      // Filter to last 30 days
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      timeFilteredHistory = commandHistory.filter(cmd => {
+        const cmdDate = new Date(cmd.timestamp || now);
+        return cmdDate >= monthAgo;
+      });
+    }
+    
+    // Apply search filter to the time-filtered data
+    const applySearchFilter = (items, getSearchableText) => {
+      if (!searchQuery) return items;
+      return items.filter(item => 
+        getSearchableText(item).toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    };
+    
+    // Filter stats
+    const filteredStatsData = applySearchFilter(
+      commandStats, 
+      item => item.command
+    );
+    setFilteredStats(filteredStatsData);
+    
+    // Filter patterns
+    const filteredPatternsData = applySearchFilter(
+      commandPatterns, 
+      pattern => `${pattern.pattern} ${pattern.suggestion} ${pattern.description}`
+    );
+    setFilteredPatterns(filteredPatternsData);
+    
+    // Filter optimizations
+    const filteredOptimizationsData = applySearchFilter(
+      optimizations, 
+      opt => `${opt.original} ${opt.optimized} ${opt.explanation} ${opt.category}`
+    );
+    setFilteredOptimizations(filteredOptimizationsData);
+    
+  }, [timeFilter, searchQuery, commandHistory, commandStats, commandPatterns, optimizations]);
   
   // Generate optimization suggestions based on command history and patterns
   useEffect(() => {
@@ -184,11 +267,11 @@ const CommandStats = ({ isVisible = false, onClose }) => {
    * @param {string} command Command to apply
    */
   const applySuggestion = (command) => {
-    // This would be integrated with the terminal input
-    // For now, just log the action
-    console.log('Applying suggestion:', command);
-    // In a real implementation, this would likely call a callback
-    // that was passed in as a prop to update the terminal input
+    // Update the terminal input with the suggested command
+    dispatch(setCurrentTerminalInput(command));
+    
+    // Optionally close the stats panel
+    handleClose();
   };
   
   /**
@@ -203,6 +286,165 @@ const CommandStats = ({ isVisible = false, onClose }) => {
    */
   const handleClose = () => {
     onClose?.();
+  };
+  
+  /**
+   * Handle exporting command statistics
+   */
+  const handleExport = () => {
+    setIsExportModalVisible(true);
+  };
+  
+  /**
+   * Export the command statistics in the selected format
+   */
+  const performExport = () => {
+    let exportData;
+    let fileName;
+    let fileContent;
+    
+    // Prepare export data based on active tab
+    switch (activeTab) {
+      case 'usage':
+        exportData = commandStats;
+        fileName = 'command-usage-stats';
+        break;
+      case 'patterns':
+        exportData = commandPatterns;
+        fileName = 'command-patterns';
+        break;
+      case 'optimizations':
+        exportData = optimizations;
+        fileName = 'command-optimizations';
+        break;
+      default:
+        exportData = {
+          usage: commandStats,
+          patterns: commandPatterns,
+          optimizations: optimizations
+        };
+        fileName = 'command-stats-all';
+    }
+    
+    // Format based on selected export format
+    switch (exportFormat) {
+      case 'json':
+        fileContent = JSON.stringify(exportData, null, 2);
+        fileName += '.json';
+        break;
+      case 'csv':
+        // Simple CSV conversion - can be enhanced for more complex data
+        const headers = Object.keys(exportData[0] || {}).join(',');
+        const rows = exportData.map(item => 
+          Object.values(item).map(val => 
+            typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
+          ).join(',')
+        );
+        fileContent = [headers, ...rows].join('\n');
+        fileName += '.csv';
+        break;
+      case 'txt':
+        // Simple text format
+        fileContent = exportData.map(item => 
+          Object.entries(item)
+            .map(([key, val]) => `${key}: ${val}`)
+            .join('\n')
+        ).join('\n\n');
+        fileName += '.txt';
+        break;
+      default:
+        fileContent = JSON.stringify(exportData);
+        fileName += '.json';
+    }
+    
+    // Create and trigger download
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    // Close modal
+    setIsExportModalVisible(false);
+  };
+  
+  /**
+   * Prepare chart data for visualization
+   */
+  const getChartData = () => {
+    const stats = filteredStats.length > 0 ? filteredStats : commandStats;
+    
+    // Generate colors
+    const generateColors = (count) => {
+      const baseColors = [
+        'rgba(54, 162, 235, 0.8)',
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(255, 206, 86, 0.8)',
+        'rgba(75, 192, 192, 0.8)',
+        'rgba(153, 102, 255, 0.8)',
+        'rgba(255, 159, 64, 0.8)',
+        'rgba(199, 199, 199, 0.8)',
+        'rgba(83, 102, 255, 0.8)',
+        'rgba(40, 159, 64, 0.8)',
+        'rgba(210, 199, 199, 0.8)',
+      ];
+      
+      // If we need more colors than in our base set, generate them
+      if (count > baseColors.length) {
+        for (let i = baseColors.length; i < count; i++) {
+          const r = Math.floor(Math.random() * 255);
+          const g = Math.floor(Math.random() * 255);
+          const b = Math.floor(Math.random() * 255);
+          baseColors.push(`rgba(${r}, ${g}, ${b}, 0.8)`);
+        }
+      }
+      
+      return baseColors.slice(0, count);
+    };
+    
+    const backgroundColor = generateColors(stats.length);
+    const borderColor = backgroundColor.map(color => color.replace('0.8', '1'));
+    
+    return {
+      labels: stats.map(item => item.command),
+      datasets: [
+        {
+          label: 'Command Usage',
+          data: stats.map(item => item.count),
+          backgroundColor,
+          borderColor,
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+  
+  /**
+   * Get chart options based on chart type
+   */
+  const getChartOptions = () => {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: 'rgba(255, 255, 255, 0.8)'
+          }
+        },
+        title: {
+          display: true,
+          text: 'Command Usage Distribution',
+          color: 'rgba(255, 255, 255, 0.9)',
+          font: {
+            size: 16
+          }
+        }
+      }
+    };
   };
   
   return (
@@ -235,7 +477,7 @@ const CommandStats = ({ isVisible = false, onClose }) => {
           Analysis of your command usage patterns and suggestions for optimization.
         </Paragraph>
         
-        <Tabs 
+        {/* Search and filter controls */}
           activeKey={activeTab}
           onChange={setActiveTab}
           className="stats-tabs"

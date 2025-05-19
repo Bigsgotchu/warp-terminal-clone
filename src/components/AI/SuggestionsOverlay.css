@@ -1,3 +1,7 @@
+/* 
+ * SuggestionsOverlay.css - Styling for both AI and autocompletion suggestions
+ */
+
 .suggestions-overlay {
   position: absolute;
   bottom: 100%;
@@ -12,6 +16,16 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   margin-bottom: 8px;
   font-family: 'JetBrains Mono', monospace;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Different styling for AI vs autocompletion suggestions */
+.suggestions-overlay.ai-suggestions {
+  border-left: 3px solid #94e2d5; /* Teal for AI */
+}
+
+.suggestions-overlay.auto-suggestions {
+  border-left: 3px solid #f5c2e7; /* Pink for autocompletion */
 }
 
 .suggestions-header {
@@ -26,7 +40,21 @@
 
 .suggestions-title {
   font-weight: 600;
-  color: #94e2d5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-suggestions .suggestions-title {
+  color: #94e2d5; /* Teal */
+}
+
+.auto-suggestions .suggestions-title {
+  color: #f5c2e7; /* Pink */
+}
+
+.header-icon {
+  font-size: 14px;
 }
 
 .suggestions-hint {
@@ -44,7 +72,11 @@
   padding: 8px 12px;
   border-bottom: 1px solid #313244;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
 }
 
 .suggestion-item:last-child {
@@ -57,20 +89,96 @@
 
 .suggestion-item.active {
   background-color: #45475a;
-  box-shadow: inset 3px 0 0 #94e2d5;
+}
+
+.ai-suggestions .suggestion-item.active {
+  box-shadow: inset 3px 0 0 #94e2d5; /* Teal for AI */
+}
+
+.auto-suggestions .suggestion-item.active {
+  box-shadow: inset 3px 0 0 #f5c2e7; /* Pink for autocompletion */
+}
+
+/* Suggestion type icons */
+.suggestion-icon {
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ai-icon {
+  color: #94e2d5; /* Teal for AI */
+}
+
+.file-icon {
+  color: #cdd6f4; /* Text color */
+}
+
+.dir-icon {
+  color: #89b4fa; /* Blue */
+}
+
+.cmd-icon {
+  color: #f9e2af; /* Yellow */
+}
+
+.flag-icon {
+  color: #f5c2e7; /* Pink */
+}
+
+.branch-icon {
+  color: #cba6f7; /* Purple */
+}
+
+.history-icon {
+  color: #fab387; /* Peach */
+}
+
+.suggestion-content {
+  flex: 1;
+  min-width: 0; /* Enables truncation */
 }
 
 .suggestion-command {
-  color: #f5c2e7;
+  color: #f5c2e7; /* Pink */
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Different colors for different suggestion types */
+.ai-suggestions .suggestion-command {
+  color: #f5c2e7; /* Pink */
+}
+
+.suggestion-item.type-directory .suggestion-command {
+  color: #89b4fa; /* Blue */
+}
+
+.suggestion-item.type-file .suggestion-command {
+  color: #cdd6f4; /* Text */
+}
+
+.suggestion-item.type-command .suggestion-command {
+  color: #f9e2af; /* Yellow */
+}
+
+.suggestion-item.type-flag .suggestion-command {
+  color: #f5c2e7; /* Pink */
+}
+
+.suggestion-item.type-branch .suggestion-command {
+  color: #cba6f7; /* Purple */
+}
+
+.suggestion-item.type-history .suggestion-command {
+  color: #fab387; /* Peach */
+}
+
 .suggestion-description {
-  color: #cdd6f4;
   font-size: 0.9em;
+  color: #a6adc8; /* Subtle text */
   margin-top: 4px;
   font-style: italic;
   white-space: nowrap;
@@ -78,6 +186,43 @@
   text-overflow: ellipsis;
 }
 
+/* Source badges */
+.suggestion-badge {
+  margin-left: 4px;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #313244;
+}
+
+.badge.ai {
+  background-color: rgba(148, 226, 213, 0.2); /* Teal background */
+  color: #94e2d5; /* Teal text */
+}
+
+.badge.history, .badge.frequency {
+  background-color: rgba(250, 179, 135, 0.2); /* Peach background */
+  color: #fab387; /* Peach text */
+}
+
+.badge.pattern {
+  background-color: rgba(203, 166, 247, 0.2); /* Purple background */
+  color: #cba6f7; /* Purple text */
+}
+
+.badge.correction, .badge.safety {
+  background-color: rgba(243, 139, 168, 0.2); /* Red background */
+  color: #f38ba8; /* Red text */
+}
+
+/* Loading state styling */
 .suggestions-loading {
   display: flex;
   align-items: center;
@@ -87,11 +232,19 @@
   color: #a6adc8;
 }
 
-.suggestions-loading .ant-spin-dot i {
-  background-color: #94e2d5;
+.ai-suggestions .suggestions-loading {
+  color: #94e2d5; /* Teal */
 }
 
-/* Scrollbar styling */
+.auto-suggestions .suggestions-loading {
+  color: #f5c2e7; /* Pink */
+}
+
+.suggestions-loading .ant-spin-dot i {
+  background-color: currentColor;
+}
+
+/* Custom scrollbar styling */
 .suggestions-overlay::-webkit-scrollbar {
   width: 6px;
 }
@@ -109,89 +262,40 @@
   background: #585b70;
 }
 
+/* Animations and transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .suggestions-overlay {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  background: #1e1e2e;
-  border: 1px solid #414558;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 8px;
+  animation: fadeIn 0.2s ease;
 }
 
-.suggestions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 12px;
-  background: #292c3c;
-  border-bottom: 1px solid #414558;
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .suggestions-overlay {
+    max-height: 180px;
+  }
+  
+  .suggestion-item {
+    padding: 6px 10px;
+  }
+  
+  .suggestion-description {
+    font-size: 0.8em;
+  }
+  
+  .suggestions-hint {
+    display: none; /* Hide hints on small screens */
+  }
 }
 
-.suggestions-title {
-  font-weight: 600;
-  color: #94e2d5;
-}
-
-.suggestions-hint {
-  font-size: 0.8em;
-  color: #a6adc8;
-}
-
-.suggestions-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #313244;
-  transition: background-color 0.15s ease;
-}
-
-.suggestion-item:last-child {
-  border-bottom: none;
-}
-
-.suggestion-item:hover {
-  background: #313244;
-}
-
-.suggestion-item.active {
-  background: #45475a;
-  box-shadow: inset 3px 0 0 #94e2d5;
-}
-
-.suggestion-command {
-  color: #f5c2e7;
-  font-weight: 500;
-}
-
-.suggestion-description {
-  font-size: 0.9em;
-  color: #cdd6f4;
-  margin-top: 4px;
-  font-style: italic;
-}
-
-.suggestions-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  color: #a6adc8;
-}
-
-.suggestions-loading .ant-spin {
-  color: #94e2d5;
-}
-
+/* Fix for duplicate export in SuggestionsOverlay.js */
+/* Remove the second export default statement */
