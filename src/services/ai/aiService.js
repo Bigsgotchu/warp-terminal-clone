@@ -2,6 +2,11 @@
  * AI Service for terminal command analysis and suggestions
  * Handles interactions with AI API for command completion and explanation
  */
+import {
+  analyzeCommandPatterns as analyzePatterns,
+  enhanceSuggestionsWithPatterns,
+  createCommandSearchIndex
+} from './commandPatternService';
 class AIService {
   constructor() {
     this.apiEndpoint = process.env.REACT_APP_AI_API_ENDPOINT || 'https://api.openai.com/v1/chat/completions';
@@ -17,6 +22,11 @@ class AIService {
     
     // Basic commands for fallback mode
     this.basicCommands = this.getBasicCommands();
+    
+    // Pattern analysis state
+    this.patternAnalysisCache = null;
+    this.searchIndex = null;
+    this.lastAnalysisTimestamp = 0;
   }
   
   /**
@@ -63,9 +73,73 @@ class AIService {
       return this.cache.get(cacheKey);
     }
     
-    // In offline mode, provide basic command completion
+    // Check for command corrections and typos
+    const correction = this.checkCommandCorrections(command);
+    
+    // If we found a correction, add it to our suggestions
+    let correctionSuggestions = [];
+    if (correction) {
+      correctionSuggestions = [correction];
+      
+      // For serious warnings, just return the correction immediately
+      if (correction.isWarning && correction.type === 'danger') {
+        const result = { 
+          suggestions: correctionSuggestions,
+          hasWarning: true
+        };
+        this.addToCache(cacheKey, result);
+        return result;
+      }
+    }
+    
+    // Always analyze command patterns locally first (regardless of online/offline mode)
+    // This provides immediate pattern-based suggestions even in offline mode
+    let patternSuggestions = [];
+    
+    // Use pattern analysis if we have some command history
+    if (context.recentCommands && context.recentCommands.length > 0) {
+      try {
+        // Get or generate pattern analysis
+        const analysis = this.getPatternAnalysis(context.recentCommands, context);
+        
+        // Enhance suggestions with patterns if analysis available
+        if (analysis) {
+          const lastCommand = context.recentCommands[0] || '';
+          patternSuggestions = enhanceSuggestionsWithPatterns(command, analysis, {
+            currentDirectory: context.currentDirectory,
+            lastCommand
+          });
+          
+          // Add source information to pattern suggestions for UI differentiation
+          patternSuggestions = patternSuggestions.map(suggestion => ({
+            ...suggestion,
+            source: 'pattern'
+          }));
+        }
+      } catch (error) {
+        console.error('Error generating pattern suggestions:', error);
+        patternSuggestions = []; // Reset on error
+      }
+    }
+    
+    // If we're in offline mode, combine pattern suggestions with basic suggestions
     if (this.offlineMode) {
-      return this.offlineAnalyzeCommand(command);
+      // Get basic suggestions for the command
+      const basicSuggestions = this.offlineAnalyzeCommand(command).suggestions || [];
+      
+      // Combine all suggestion types
+      const combinedSuggestions = [
+        ...correctionSuggestions,  // Correction suggestions first (highest priority)
+        ...patternSuggestions,     // Pattern-based suggestions next
+        ...basicSuggestions        // Basic offline suggestions last
+      ];
+      
+      // Remove duplicates and limit to 7 suggestions
+      const dedupedSuggestions = this.deduplicateSuggestions(combinedSuggestions).slice(0, 7);
+      
+      const result = { suggestions: dedupedSuggestions };
+      this.addToCache(cacheKey, result);
+      return result;
     }
     
     try {
@@ -101,12 +175,37 @@ class AIService {
       }
       
       const data = await response.json();
-      const suggestions = this.parseSuggestions(data.choices[0].message.content);
+      const apiSuggestions = this.parseSuggestions(data.choices[0].message.content);
+      
+      // Combine AI suggestions with pattern-based suggestions
+      const combinedSuggestions = [
+        ...patternSuggestions, // Pattern-based suggestions first (higher priority)
+        ...apiSuggestions      // Then AI-generated suggestions
+      ];
+      
+      // Remove duplicates and limit to 7 suggestions
+      const dedupedSuggestions = this.deduplicateSuggestions(combinedSuggestions).slice(0, 7);
+      
+      // Categorize suggestions to provide more context to the user
+      const categorizedSuggestions = dedupedSuggestions.map(suggestion => {
+        // Keep existing source information if available
+        if (suggestion.source) {
+          return suggestion;
+        }
+        
+        // Otherwise, mark as AI-generated
+        return {
+          ...suggestion,
+          source: 'ai'
+        };
+      });
+      
+      const result = { suggestions: categorizedSuggestions };
       
       // Cache the result
-      this.addToCache(cacheKey, { suggestions });
+      this.addToCache(cacheKey, result);
       
-      return { suggestions };
+      return result;
     } catch (error) {
       console.error('AI service error:', error);
       
@@ -230,15 +329,35 @@ Keep suggestions relevant and focused on the current command.
       return { patterns: [] };
     }
     
-    // For offline mode, use basic pattern matching
+    // Use our local pattern analysis first for immediate results
+    const localAnalysis = this.getPatternAnalysis(commandHistory, {
+      currentDirectory: this.getCurrentDirectory(commandHistory)
+    });
+    
+    // For offline mode, use only local pattern analysis
     if (this.offlineMode) {
-      return this.offlineAnalyzePatterns(commandHistory);
+      return {
+        patterns: localAnalysis?.recognizedPatterns || [],
+        commandFrequency: localAnalysis?.commandFrequency || [],
+        commandSequences: localAnalysis?.commandSequences || [],
+        optimizations: localAnalysis?.optimizations || []
+      };
     }
     
+    // For online mode, enhance with AI-based pattern analysis
     try {
+      // Include any optimizations from local analysis in the prompt
+      const localOptimizations = localAnalysis?.optimizations || [];
+      const optimizationPrompt = localOptimizations.length > 0 
+        ? `\nI've identified these potential optimizations:\n${localOptimizations
+            .map(opt => `- ${opt.original} → ${opt.optimized} (${opt.explanation})`)
+            .join('\n')}`
+        : '';
+      
       const prompt = `
 Analyze these recent terminal commands and identify patterns or suggest follow-up commands:
 ${commandHistory.slice(0, 10).join('\n')}
+${optimizationPrompt}
 
 Based on this command history:
 1. What patterns do you see?
@@ -276,12 +395,24 @@ Format your response as a list of suggestions with explanations.
       }
       
       const data = await response.json();
+      const aiPatterns = this.parsePatterns(data.choices[0].message.content);
+      
+      // Combine AI-generated patterns with local pattern analysis
       return { 
-        patterns: this.parsePatterns(data.choices[0].message.content)
+        patterns: [...aiPatterns, ...(localAnalysis?.recognizedPatterns || [])],
+        commandFrequency: localAnalysis?.commandFrequency || [],
+        commandSequences: localAnalysis?.commandSequences || [],
+        optimizations: localAnalysis?.optimizations || []
       };
     } catch (error) {
       console.error('Command pattern analysis error:', error);
-      return this.offlineAnalyzePatterns(commandHistory);
+      // Fall back to just the local analysis on error
+      return {
+        patterns: localAnalysis?.recognizedPatterns || [],
+        commandFrequency: localAnalysis?.commandFrequency || [],
+        commandSequences: localAnalysis?.commandSequences || [],
+        optimizations: localAnalysis?.optimizations || []
+      };
     }
   }
   
@@ -657,6 +788,9 @@ IMPORTANT: Format your response as a valid JSON object with those exact fields.
     const stats = {
       size: this.cache.size,
       maxSize: this.cacheSize,
+      patternAnalysisAge: this.lastAnalysisTimestamp > 0 
+        ? Math.floor((Date.now() - this.lastAnalysisTimestamp) / 1000) + ' seconds ago'
+        : 'never',
       categories: {
         suggestions: 0,
         explanations: 0,
@@ -691,9 +825,284 @@ IMPORTANT: Format your response as a valid JSON object with those exact fields.
     console.log('AI Service cleaning up...');
     this.clearCache();
   }
+  
+  /**
+   * Remove duplicate suggestions based on command
+   * @param {Array} suggestions - Array of suggestion objects
+   * @returns {Array} - Deduplicated suggestions
+   */
+  deduplicateSuggestions(suggestions) {
+    const dedupedSuggestions = [];
+    const seen = new Set();
+    
+    suggestions.forEach(suggestion => {
+      if (!seen.has(suggestion.command)) {
+        dedupedSuggestions.push(suggestion);
+        seen.add(suggestion.command);
+      }
+    });
+    
+    return dedupedSuggestions;
+  }
+  
+  /**
+   * Check for common command errors and provide corrections
+   * @param {string} command - The command to check
+   * @returns {Object|null} - Correction suggestion or null if no errors found
+   */
+  checkCommandCorrections(command) {
+    if (!command || command.trim() === '') {
+      return null;
+    }
+    
+    // Get or initialize corrections module
+    const corrections = this.getCommandCorrections();
+    
+    // Check for exact matches in common typos
+    if (corrections.commonTypos[command]) {
+      return {
+        command: corrections.commonTypos[command].correction,
+        description: corrections.commonTypos[command].explanation,
+        source: 'correction',
+        score: 0.98,  // Very high score for direct typo corrections
+        type: 'typo'
+      };
+    }
+    
+    // Check for dangerous commands
+    for (const [pattern, info] of Object.entries(corrections.dangerousCommands)) {
+      if (command.match(new RegExp(pattern))) {
+        return {
+          command: info.safeAlternative || command,
+          description: `⚠️ ${info.warning}`,
+          source: 'safety',
+          score: 0.99,  // Highest priority for safety warnings
+          type: 'danger',
+          isWarning: true
+        };
+      }
+    }
+    
+    // Check for common mistakes in command syntax
+    for (const [pattern, info] of Object.entries(corrections.syntaxErrors)) {
+      if (command.match(new RegExp(pattern))) {
+        return {
+          command: info.correctedForm,
+          description: info.explanation,
+          source: 'syntax',
+          score: 0.97,
+          type: 'syntax'
+        };
+      }
+    }
+    
+    // Check for fuzzy matches in common commands
+    const words = command.split(' ');
+    const firstWord = words[0];
+    
+    // Only check first word of command for fuzzy matches
+    if (firstWord && firstWord.length >= 2) {
+      const topMatch = this.findClosestCommand(firstWord);
+      
+      if (topMatch && topMatch.distance <= 2 && topMatch.command !== firstWord) {
+        // Replace the first word with the correction
+        words[0] = topMatch.command;
+        const correctedCommand = words.join(' ');
+        
+        return {
+          command: correctedCommand,
+          description: `Did you mean '${topMatch.command}'?`,
+          source: 'fuzzy',
+          score: 0.96,
+          type: 'fuzzy'
+        };
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Get command corrections database
+   * @returns {Object} - Correction patterns object
+   */
+  getCommandCorrections() {
+    // Lazy initialize the corrections object
+    if (!this._corrections) {
+      this._corrections = {
+        // Common typos and their corrections
+        commonTypos: {
+          'cd..': { 
+            correction: 'cd ..', 
+            explanation: 'Space required between cd and ..' 
+          },
+          'giit': { 
+            correction: 'git', 
+            explanation: 'Typo in git command' 
+          },
+          'grpe': { 
+            correction: 'grep', 
+            explanation: 'Typo in grep command' 
+          },
+          'pythno': { 
+            correction: 'python', 
+            explanation: 'Typo in python command' 
+          },
+          'npmm': { 
+            correction: 'npm', 
+            explanation: 'Typo in npm command' 
+          },
+          'tra': { 
+            correction: 'tar', 
+            explanation: 'Typo in tar command' 
+          },
+          'cta': { 
+            correction: 'cat', 
+            explanation: 'Typo in cat command' 
+          },
+          'mkidr': { 
+            correction: 'mkdir', 
+            explanation: 'Typo in mkdir command' 
+          },
+          'touhc': { 
+            correction: 'touch', 
+            explanation: 'Typo in touch command' 
+          },
+          'suod': { 
+            correction: 'sudo', 
+            explanation: 'Typo in sudo command' 
+          }
+        },
+        
+        // Dangerous commands that need warnings
+        dangerousCommands: {
+          '^rm\\s+-rf\\s+/': {
+            warning: 'This command will delete your entire filesystem!',
+            safeAlternative: null  // No safe alternative, just a warning
+          },
+          '^rm\\s+-rf\\s+~': {
+            warning: 'This command will delete your home directory!',
+            safeAlternative: null
+          },
+          '^rm\\s+-rf\\s+\\.': {
+            warning: 'This will delete the current directory and all contents',
+            safeAlternative: 'rm -rf ./specific-dir'
+          },
+          '^chmod\\s+-R\\s+777': {
+            warning: 'Setting 777 permissions is a security risk',
+            safeAlternative: 'chmod -R 755 for directories, 644 for files'
+          },
+          '^sudo\\s+chmod\\s+-R\\s+777': {
+            warning: 'Setting 777 permissions is a security risk',
+            safeAlternative: 'sudo chmod -R 755 for directories, 644 for files'
+          },
+          'git\\s+reset\\s+--hard': {
+            warning: 'This will discard all local changes!',
+            safeAlternative: 'git stash to preserve changes'
+          },
+          ':\\s*[wW][qQ]!': {
+            warning: 'Force-quitting Vim without saving changes',
+            safeAlternative: ':w to save changes first'
+          }
+        },
+        
+        // Common syntax errors
+        syntaxErrors: {
+          '^cd\\s+([^\\s]+)\\s+([^\\s]+)': {
+            correctedForm: 'cd $1',
+            explanation: 'cd only takes one directory argument'
+          },
+          '^git\\s+commit\\s+([^-].*)': {
+            correctedForm: 'git commit -m "$1"',
+            explanation: 'Missing -m flag for commit message'
+          },
+          '^git\\s+add\\s+(\\S+)\\s+git\\s+commit': {
+            correctedForm: 'git add $1 && git commit',
+            explanation: 'Use && between commands'
+          },
+          '^find\\s+\\S+\\s+-name': {
+            correctedForm: 'find $1 -name "*pattern*"',
+            explanation: 'The -name argument needs a pattern in quotes'
+          }
+        }
+      };
+      
+      // Add common commands for fuzzy matching
+      this._corrections.commonCommands = Object.keys(this.basicCommands);
+    }
+    
+    return this._corrections;
+  }
+  
+  /**
+   * Find the closest matching command using Levenshtein distance
+   * @param {string} input - User input to check
+   * @returns {Object|null} - Closest match with distance score
+   */
+  findClosestCommand(input) {
+    if (!input || input.length < 2) return null;
+    
+    const corrections = this.getCommandCorrections();
+    const commands = corrections.commonCommands;
+    
+    let bestMatch = null;
+    let minDistance = Infinity;
+    
+    for (const command of commands) {
+      // Skip if lengths are too different (optimization)
+      if (Math.abs(command.length - input.length) > 3) continue;
+      
+      const distance = this.levenshteinDistance(input.toLowerCase(), command.toLowerCase());
+      
+      if (distance < minDistance && distance <= 3) { // Only consider reasonable distances
+        minDistance = distance;
+        bestMatch = {
+          command,
+          distance
+        };
+      }
+    }
+    
+    return bestMatch;
+  }
+  
+  /**
+   * Calculate Levenshtein distance between two strings
+   * @param {string} a - First string
+   * @param {string} b - Second string
+   * @returns {number} - Edit distance
+   */
+  levenshteinDistance(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    
+    const matrix = [];
+    
+    // Initialize matrix
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    
+    // Fill matrix
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        const cost = a[j - 1] === b[i - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1,      // insertion
+          matrix[i - 1][j - 1] + cost // substitution
+        );
+      }
+    }
+    
+    return matrix[b.length][a.length];
+  }
 }
 
-// Create singleton instance
 export const aiService = new AIService();
 
 // Set up cleanup handlers
