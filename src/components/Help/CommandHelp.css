@@ -1,0 +1,721 @@
+/* CommandHelp.css - Styling for the command help and documentation component */
+
+/* Drawer container */
+.command-help-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.command-help-drawer .ant-drawer-content-wrapper {
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.command-help-drawer .ant-drawer-content {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.command-help-drawer .ant-drawer-header {
+  background-color: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+}
+
+.command-help-drawer .ant-drawer-title {
+  color: var(--heading-color);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.command-help-drawer .ant-drawer-close {
+  color: var(--text-secondary-color);
+}
+
+/* Main layout and sections */
+.command-reference {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--background-color);
+}
+
+/* Search and filters */
+.command-search {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--background-secondary-color);
+}
+
+.command-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-background-color);
+  color: var(--text-color);
+}
+
+.command-search input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.command-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.command-filter-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: var(--tag-background-color);
+  color: var(--tag-text-color);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.command-filter-tag:hover {
+  background-color: var(--tag-hover-background-color);
+}
+
+.command-filter-tag.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Command list */
+.command-list-container {
+  flex: 1;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-color);
+}
+
+.command-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.command-list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.command-list-item:hover {
+  background-color: var(--hover-background-color);
+}
+
+.command-list-item.active {
+  background-color: var(--selected-background-color);
+  border-left: 3px solid var(--primary-color);
+}
+
+.command-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--heading-color);
+  margin-bottom: 4px;
+}
+
+.command-brief {
+  font-size: 12px;
+  color: var(--text-secondary-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Command details styles */
+.command-details {
+  padding: 16px;
+  background: var(--background-secondary-color);
+  flex: 2;
+  overflow-y: auto;
+}
+
+.command-details-header {
+  margin-bottom: 20px;
+}
+
+.command-details-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.command-details-title-icon {
+  margin-right: 10px;
+  color: var(--primary-color);
+}
+
+.command-details-category {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  background-color: var(--tag-background-color);
+  color: var(--tag-text-color);
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.command-details-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+/* Command syntax section */
+.command-syntax {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.syntax-box {
+  background-color: var(--code-background-color);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  color: var(--code-text-color);
+}
+
+.command-option {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.command-option:last-child {
+  border-bottom: none;
+}
+
+.option-name {
+  font-weight: 600;
+  color: var(--code-keyword-color);
+}
+
+.option-description {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+/* Examples section */
+.command-examples {
+  margin-bottom: 24px;
+}
+
+.example-item {
+  margin-bottom: 16px;
+}
+
+.example-description {
+  font-size: 13px;
+  color: var(--text-secondary-color);
+  margin-bottom: 8px;
+}
+
+.example-code {
+  background-color: var(--code-background-color);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  position: relative;
+  overflow-x: auto;
+}
+
+.example-code pre {
+  margin: 0;
+  color: var(--code-text-color);
+}
+
+.copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.example-code:hover .copy-button {
+  opacity: 1;
+}
+
+.run-example-button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s;
+}
+
+.run-example-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+/* Tabs for different sections */
+.command-help-tabs {
+  margin-top: 24px;
+}
+
+.command-help-tabs .ant-tabs-nav {
+  margin-bottom: 16px;
+}
+
+.command-help-tabs .ant-tabs-tab {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--text-secondary-color);
+}
+
+.command-help-tabs .ant-tabs-tab.ant-tabs-tab-active {
+  color: var(--primary-color);
+}
+
+.command-help-tabs .ant-tabs-tab-btn {
+  font-weight: 500;
+}
+
+.command-help-tabs .ant-tabs-ink-bar {
+  background-color: var(--primary-color);
+}
+
+/* Tutorials tab */
+.tutorials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tutorial-card {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tutorial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tutorial-card-header {
+  padding: 12px 16px;
+  background-color: var(--card-header-background);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tutorial-title {
+  font-weight: 600;
+  color: var(--heading-color);
+  margin: 0;
+}
+
+.tutorial-difficulty {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.difficulty-beginner {
+  background-color: #52c41a1a;
+  color: #52c41a;
+}
+
+.difficulty-intermediate {
+  background-color: #1890ff1a;
+  color: #1890ff;
+}
+
+.difficulty-advanced {
+  background-color: #fa541c1a;
+  color: #fa541c;
+}
+
+.tutorial-card-content {
+  padding: 16px;
+}
+
+.tutorial-description {
+  font-size: 13px;
+  color: var(--text-color);
+  margin-bottom: 12px;
+}
+
+.tutorial-steps {
+  margin-top: 12px;
+}
+
+/* Insights tab */
+.insights-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.usage-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 160px;
+  background-color: var(--card-background-color);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary-color);
+}
+
+.command-patterns {
+  margin-top: 16px;
+}
+
+.pattern-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.pattern-item:last-child {
+  border-bottom: none;
+}
+
+.pattern-description {
+  font-size: 13px;
+  color: var(--text-secondary-color);
+  margin-bottom: 8px;
+}
+
+.pattern-command {
+  background-color: var(--code-background-color);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--code-text-color);
+}
+
+/* History list */
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-item {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-timestamp {
+  width: 120px;
+  font-size: 12px;
+  color: var(--text-secondary-color);
+}
+
+.history-command {
+  flex: 1;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--code-text-color);
+}
+
+/* Related commands */
+.related-commands {
+  margin-top: 24px;
+}
+
+.related-commands-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.related-command-pill {
+  padding: 6px 12px;
+  background-color: var(--tag-background-color);
+  color: var(--tag-text-color);
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.related-command-pill:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 768px) {
+  .command-help-drawer .ant-drawer-content-wrapper {
+    width: 100% !important;
+  }
+  
+  .command-details-container {
+    flex-direction: column;
+  }
+  
+  .command-list-container {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    max-height: 300px;
+  }
+}
+
+/* Dark/Light theme variables will be provided by a theme provider */
+:root {
+  /* Light theme (default) */
+  --background-color: #ffffff;
+  --background-secondary-color: #f5f7f9;
+  --text-color: #333333;
+  
+
+/* CommandHelp.css - Styling for the Command Help & Documentation component */
+
+.command-help-drawer .ant-drawer-body {
+  padding: 0;
+}
+
+.command-help-drawer .ant-tabs {
+  height: 100%;
+}
+
+.command-help-drawer .ant-tabs-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.command-help-drawer .ant-tabs-tabpane {
+  padding: 16px;
+}
+
+/* Reference section styling */
+.command-reference {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.command-search {
+  margin-bottom: 16px;
+}
+
+.command-list-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 200px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.command-list {
+  height: 100%;
+}
+
+.command-list-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.command-list-item:hover {
+  background-color: #f5f5f5;
+}
+
+.command-list-item.selected {
+  background-color: #e6f7ff;
+}
+
+.command-list-item-content {
+  width: 100%;
+}
+
+.command-name {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.command-description {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.command-details {
+  flex: 2;
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.command-syntax {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.command-options .ant-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.option-name {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.option-description {
+  color: #666;
+}
+
+.command-examples .ant-list-item {
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* Discover section styling */
+.command-discover {
+  overflow-y: auto;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.category-card {
+  height: 100%;
+}
+
+.category-commands {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-commands li {
+  margin-bottom: 4px;
+}
+
+/* Learn section styling */
+.command-learn {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.active-tutorial {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tutorial-content {
+  margin-top: 24px;
+  flex: 1;
+}
+
+.step-card {
+  margin-top: 16px;
+}
+
+.step-explanation {
+  margin-top: 16px;
+  font-style: italic;
+  color: #666;
+}
+
+.tutorial-list .ant-list-item {
+  margin-bottom: 16px;
+}
+
+.tutorial-list .ant-card {
+  width: 100%;
+  transition: transform 0.2s ease;
+}
+
+.tutorial-list .ant-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Insights section styling */
+.command-insights {
+  overflow-y: auto;
+}
+
+.insights-card {
+  margin-bottom: 16px;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .command-help-drawer {
+    width: 100% !important;
+  }
+}
+
