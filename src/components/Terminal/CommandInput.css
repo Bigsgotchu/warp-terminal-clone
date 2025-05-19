@@ -9,16 +9,28 @@
 }
 
 .command-prompt {
+  display: flex;
+  align-items: center;
   color: #4caf50;
   margin-right: 8px;
   font-weight: bold;
   font-family: 'Consolas', 'Courier New', monospace;
   white-space: nowrap;
+  user-select: none; /* Prevent selection of prompt */
 }
 
 /* Directory path can be styled differently */
 .directory-part {
   color: #4caf50;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: max-width 0.3s ease;
+}
+
+/* Expand directory on hover */
+.command-prompt:hover .directory-part {
+  max-width: 500px;
 }
 
 /* Prompt symbol */
@@ -35,15 +47,26 @@
   caret-color: #1890ff;
   height: 32px;
   padding: 0;
+  transition: background-color 0.2s ease;
 }
 
 .command-input:focus {
   box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.command-input:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 .command-input:disabled {
   background-color: transparent !important;
   opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.command-input::placeholder {
+  color: rgba(240, 240, 240, 0.4);
 }
 
 .command-spinner {
@@ -51,6 +74,19 @@
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.command-spinner .ant-spin-dot i {
+  background-color: #f0f0f0 !important; /* White spinner for processing */
+}
+
+.input-status {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
 }
 
 /* AI Feature Styles */
@@ -78,9 +114,21 @@
 }
 
 .ai-indicator {
-  font-size: 12px;
+  font-size: 11px;
   color: #1890ff;
   font-weight: bold;
+  background-color: rgba(24, 144, 255, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* Different spinner colors for AI vs autocompletion */
+.ai-spinner .ant-spin-dot i {
+  background-color: #1890ff !important; /* Blue for AI */
+}
+
+.completion-spinner .ant-spin-dot i {
+  background-color: #52c41a !important; /* Green for autocompletion */
 }
 
 /* When a suggestion is active */
@@ -96,11 +144,24 @@
   font-size: 10px;
   color: #666;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.2s;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none; /* Prevent interfering with clicks */
 }
 
 .command-input-container:hover .keyboard-hint {
-  opacity: 1;
+  opacity: 0.8;
+}
+
+/* Different hint styling when in AI vs autocompletion mode */
+.command-input-container:hover .keyboard-hint:contains('AI') {
+  color: #1890ff;
+}
+
+.command-input-container:hover .keyboard-hint:contains('autocompletion') {
+  color: #52c41a;
 }
 
 /* Animations for suggestions appearing */
@@ -129,4 +190,34 @@
 
 .suggestions-overlay::-webkit-scrollbar-thumb:hover {
   background: #666;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .command-prompt {
+    font-size: 13px;
+  }
+  
+  .directory-part {
+    max-width: 120px;
+  }
+  
+  .command-input {
+    font-size: 13px;
+  }
+  
+  .keyboard-hint {
+    display: none; /* Hide on small screens */
+  }
+}
+
+/* Additional cursor styling for improved visibility */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.command-input {
+  caret-shape: block; /* Modern browsers */
+  caret-color: #1890ff;
 }
