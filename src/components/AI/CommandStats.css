@@ -1,0 +1,452 @@
+/* Command Stats Component Styles */
+
+/* Container and positioning */
+.command-stats-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 800px;
+  z-index: 1000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  outline: none;
+  animation: fadeIn 0.2s ease-out;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animations and transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Card styling */
+.stats-card {
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Theme support - Dark theme */
+.theme-dark .stats-card {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid #414558;
+}
+
+/* Theme support - Light theme */
+.theme-light .stats-card {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #e0e0e0;
+}
+
+/* Header styling */
+.stats-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.stats-header .anticon {
+  color: #1890ff;
+}
+
+.theme-dark .stats-header .anticon {
+  color: #94e2d5;
+}
+
+.stats-header .close-button {
+  margin-left: auto;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.theme-dark .stats-header .close-button {
+  color: #bac2de;
+}
+
+.stats-header .close-button:hover {
+  color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.theme-dark .stats-header .close-button:hover {
+  color: #cdd6f4;
+  background-color: #313244;
+}
+
+/* Description text */
+.stats-desc {
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.theme-dark .stats-desc {
+  color: #a6adc8;
+}
+
+/* Tabs styling */
+.stats-tabs {
+  flex: 1;
+  overflow: auto;
+}
+
+.stats-tabs .ant-tabs-nav {
+  margin-bottom: 16px;
+}
+
+.theme-dark .stats-tabs .ant-tabs-tab {
+  color: #a6adc8;
+}
+
+.theme-dark .stats-tabs .ant-tabs-tab.ant-tabs-tab-active {
+  color: #94e2d5;
+}
+
+.theme-dark .stats-tabs .ant-tabs-ink-bar {
+  background-color: #94e2d5;
+}
+
+.theme-dark .stats-tabs .ant-tabs-content {
+  color: #cdd6f4;
+}
+
+/* Usage statistics */
+.command-usage-stats {
+  margin-bottom: 16px;
+}
+
+.usage-list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.theme-dark .usage-list-item {
+  border-bottom: 1px solid #313244;
+}
+
+.command-usage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.command-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.command-name .anticon {
+  color: #1890ff;
+}
+
+.theme-dark .command-name .anticon {
+  color: #94e2d5;
+}
+
+.usage-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usage-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.usage-progress {
+  width: 150px;
+}
+
+.usage-percent {
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Pattern visualization */
+.command-patterns {
+  margin-bottom: 16px;
+}
+
+.pattern-list-item {
+  padding: 12px;
+  margin-bottom: 12px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+.theme-dark .pattern-list-item {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.pattern-item {
+  width: 100%;
+}
+
+.pattern-header {
+  margin-bottom: 8px;
+}
+
+.pattern-badge {
+  font-weight: 500;
+}
+
+.theme-dark .pattern-badge {
+  color: #94e2d5;
+}
+
+.pattern-content {
+  padding-left: 8px;
+}
+
+.pattern-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pattern-description {
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
+/* Optimization suggestions */
+.command-optimizations {
+  margin-bottom: 16px;
+}
+
+.optimization-list-item {
+  padding: 12px;
+  margin-bottom: 12px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+.theme-dark .optimization-list-item {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.optimization-item {
+  width: 100%;
+}
+
+.optimization-header {
+  margin-bottom: 8px;
+}
+
+.optimization-content {
+  padding-left: 8px;
+}
+
+.optimization-commands {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.original-command, 
+.optimized-command {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.optimization-arrow {
+  color: #1890ff;
+}
+
+.theme-dark .optimization-arrow {
+  color: #94e2d5;
+}
+
+.optimization-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  background-color: rgba(24, 144, 255, 0.05);
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.theme-dark .optimization-explanation {
+  background-color: rgba(148, 226, 213, 0.05);
+}
+
+.explanation-icon {
+  color: #faad14;
+  margin-top: 4px;
+}
+
+.theme-dark .explanation-icon {
+  color: #f9e2af;
+}
+
+/* Bottom action area */
+.stats-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+/* Keyboard shortcut hints */
+.keyboard-hint {
+  display: flex;
+  gap: 8px;
+}
+
+.keyboard-hint .ant-tag {
+  margin-right: 0;
+}
+
+/* Code blocks */
+.ant-typography-code {
+  margin: 0 2px;
+}
+
+.theme-dark .ant-typography-code {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Empty state */
+.ant-empty-normal {
+  margin: 32px 0;
+}
+
+.theme-dark .ant-empty-description {
+  color: #a6adc8;
+}
+
+/* Focus management */
+.command-stats-container:focus {
+  outline: 2px solid #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.theme-dark .command-stats-container:focus {
+  outline-color: #94e2d5;
+  box-shadow: 0 0 0 2px rgba(148, 226, 213, 0.2);
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  .command-stats-container {
+    width: 95%;
+    max-width: none;
+    max-height: 95vh;
+  }
+  
+  .command-usage-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .usage-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .usage-progress {
+    flex: 1;
+  }
+  
+  .optimization-commands {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .optimization-arrow {
+    transform: rotate(90deg);
+    margin: 8px 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .stats-actions button {
+    width: 100%;
+  }
+  
+  .keyboard-hint {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .stats-tabs .ant-tabs-nav .ant-tabs-tab {
+    padding: 8px 12px;
+  }
+}
+
+/* Accessibility - focus visible */
+.command-stats-container *:focus-visible {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+.theme-dark .command-stats-container *:focus-visible {
+  outline-color: #94e2d5;
+}
+
+/* Ant Design overrides for better theme integration */
+.theme-dark .ant-list-item {
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-card-head {
+  background-color: #292c3c;
+  border-bottom: 1px solid #414558;
+}
+
+.theme-dark .ant-card-body {
+  background-color: #1e1e2e;
+}
+
+.theme-dark .ant-divider {
+  border-color: #414558;
+}
+
+.theme-dark .ant-btn {
+  background-color: #313244;
+  border-color: #45475a;
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-btn:hover {
+  background-color: #45475a;
+  border-color: #94e2d5;
+  color: #94e2d5;
+}
+
+.theme-dark .ant-tag {
+  border-color: #45475a;
+  background: #313244;
+}

@@ -1,0 +1,132 @@
+.command-input-container {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #1c1c1c;
+  border-top: 1px solid #333;
+  width: 100%;
+  position: relative;
+}
+
+.command-prompt {
+  color: #4caf50;
+  margin-right: 8px;
+  font-weight: bold;
+  font-family: 'Consolas', 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+/* Directory path can be styled differently */
+.directory-part {
+  color: #4caf50;
+}
+
+/* Prompt symbol */
+.prompt-symbol {
+  color: #f0f0f0;
+}
+
+.command-input {
+  flex: 1;
+  background-color: transparent !important;
+  color: #f0f0f0 !important;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  caret-color: #1890ff;
+  height: 32px;
+  padding: 0;
+}
+
+.command-input:focus {
+  box-shadow: none !important;
+}
+
+.command-input:disabled {
+  background-color: transparent !important;
+  opacity: 0.7;
+}
+
+.command-spinner {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* AI Feature Styles */
+
+/* Suggestions overlay positioning */
+.suggestions-overlay {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 4px;
+  z-index: 1000;
+  border-radius: 4px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* AI analyzing indicator */
+.ai-analyzing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.ai-indicator {
+  font-size: 12px;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+/* When a suggestion is active */
+.command-input.has-suggestion {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+/* Keyboard navigation hint */
+.keyboard-hint {
+  position: absolute;
+  right: 10px;
+  bottom: -18px;
+  font-size: 10px;
+  color: #666;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.command-input-container:hover .keyboard-hint {
+  opacity: 1;
+}
+
+/* Animations for suggestions appearing */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.suggestions-overlay {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Ensure proper scrolling for suggestions */
+.suggestions-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-overlay::-webkit-scrollbar-track {
+  background: #1c1c1c;
+}
+
+.suggestions-overlay::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.suggestions-overlay::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}

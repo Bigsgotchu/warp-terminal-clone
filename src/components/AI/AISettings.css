@@ -1,0 +1,406 @@
+/* AI Settings Panel Styles */
+
+/* Container and positioning */
+.ai-settings-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  z-index: 1001;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Animations and transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Card styling */
+.settings-card {
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Theme support - Dark theme */
+.theme-dark .settings-card {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid #414558;
+}
+
+/* Theme support - Light theme */
+.theme-light .settings-card {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #e0e0e0;
+}
+
+/* Header styling */
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.theme-dark .settings-header .anticon {
+  color: #94e2d5;
+}
+
+.theme-light .settings-header .anticon {
+  color: #1890ff;
+}
+
+/* Enable/disable toggle section */
+.enable-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid;
+  margin-bottom: 16px;
+}
+
+.theme-dark .enable-toggle-container {
+  border-color: #414558;
+}
+
+.theme-light .enable-toggle-container {
+  border-color: #e0e0e0;
+}
+
+.enable-toggle-item {
+  margin-bottom: 0 !important;
+}
+
+.enable-toggle {
+  min-width: 50px;
+}
+
+.enable-status {
+  font-weight: 500;
+}
+
+/* Scrollable content area */
+.settings-content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+  max-height: calc(80vh - 150px);
+}
+
+/* Settings sections */
+.settings-section {
+  margin-bottom: 24px;
+}
+
+.settings-section h5 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.theme-dark .settings-section h5 {
+  color: #94e2d5;
+}
+
+.theme-light .settings-section h5 {
+  color: #1890ff;
+}
+
+/* Settings labels */
+.settings-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-icon {
+  font-size: 14px;
+  cursor: help;
+}
+
+.theme-dark .info-icon {
+  color: #bac2de;
+}
+
+.theme-light .info-icon {
+  color: #8c8c8c;
+}
+
+/* Form element styling */
+.ai-settings-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+/* Input styling */
+.theme-dark .ant-input,
+.theme-dark .ant-input-password {
+  background-color: #313244;
+  border-color: #45475a;
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-input:hover,
+.theme-dark .ant-input-password:hover {
+  border-color: #94e2d5;
+}
+
+.theme-dark .ant-input:focus,
+.theme-dark .ant-input-password:focus,
+.theme-dark .ant-input-focused,
+.theme-dark .ant-input-password-focused {
+  border-color: #94e2d5;
+  box-shadow: 0 0 0 2px rgba(148, 226, 213, 0.2);
+}
+
+/* Select styling */
+.theme-dark .ant-select .ant-select-selector {
+  background-color: #313244;
+  border-color: #45475a;
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-select-dropdown {
+  background-color: #313244;
+  border: 1px solid #45475a;
+}
+
+.theme-dark .ant-select-item {
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-select-item-option-selected {
+  background-color: #45475a;
+}
+
+.theme-dark .ant-select-item-option-active {
+  background-color: rgba(148, 226, 213, 0.1);
+}
+
+/* Switch styling */
+.theme-dark .ant-switch {
+  background-color: #45475a;
+}
+
+.theme-dark .ant-switch-checked {
+  background-color: #94e2d5;
+}
+
+/* Slider styling */
+.theme-dark .ant-slider-rail {
+  background-color: #45475a;
+}
+
+.theme-dark .ant-slider-track {
+  background-color: #94e2d5;
+}
+
+.theme-dark .ant-slider-handle {
+  border-color: #94e2d5;
+  background-color: #1e1e2e;
+}
+
+.theme-dark .ant-slider-mark-text {
+  color: #bac2de;
+}
+
+/* Divider styling */
+.theme-dark .ant-divider {
+  border-color: #414558;
+}
+
+.theme-light .ant-divider {
+  border-color: #e0e0e0;
+}
+
+/* Data management section */
+.data-management-note {
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Bottom action buttons */
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid;
+}
+
+.theme-dark .settings-actions {
+  border-color: #414558;
+}
+
+.theme-light .settings-actions {
+  border-color: #e0e0e0;
+}
+
+/* Button styling */
+.theme-dark .ant-btn {
+  background-color: #313244;
+  border-color: #45475a;
+  color: #cdd6f4;
+}
+
+.theme-dark .ant-btn:hover {
+  background-color: #45475a;
+  border-color: #94e2d5;
+  color: #94e2d5;
+}
+
+.theme-dark .ant-btn-primary {
+  background-color: #94e2d5;
+  border-color: #94e2d5;
+  color: #1e1e2e;
+}
+
+.theme-dark .ant-btn-primary:hover {
+  background-color: #89dceb;
+  border-color: #89dceb;
+}
+
+.theme-dark .ant-btn-dangerous {
+  color: #f38ba8;
+  border-color: #f38ba8;
+}
+
+.theme-dark .ant-btn-dangerous:hover {
+  color: #1e1e2e;
+  background-color: #f38ba8;
+}
+
+/* Keyboard shortcuts */
+.keyboard-hint {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.keyboard-shortcut {
+  background-color: #45475a;
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #94e2d5;
+  font-size: 12px;
+}
+
+/* Accessibility focus styles */
+.ai-settings-container:focus,
+.ai-settings-container:focus-within {
+  outline: none;
+}
+
+.ai-settings-form button:focus,
+.ai-settings-form input:focus,
+.ai-settings-form .ant-select:focus {
+  outline: 2px solid #94e2d5;
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ai-settings-container {
+    width: 95%;
+    max-width: none;
+    max-height: 95vh;
+  }
+  
+  .settings-content-scrollable {
+    max-height: calc(90vh - 150px);
+  }
+}
+
+@media (max-width: 576px) {
+  .enable-toggle-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .settings-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .settings-actions button {
+    width: 100%;
+  }
+}
+
+/* Light mode theme overrides */
+.theme-light .ant-input,
+.theme-light .ant-input-password {
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  color: #333333;
+}
+
+.theme-light .ant-input:hover,
+.theme-light .ant-input-password:hover {
+  border-color: #1890ff;
+}
+
+.theme-light .ant-input:focus,
+.theme-light .ant-input-password:focus,
+.theme-light .ant-input-focused,
+.theme-light .ant-input-password-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.theme-light .ant-btn {
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  color: #333333;
+}
+
+.theme-light .ant-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.theme-light .ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #ffffff;
+}
+
+.theme-light .ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* Focus-visible accessibility improvement */
+.ai-settings-container *:focus-visible {
+  outline: 2px solid #94e2d5;
+  outline-offset: 2px;
+}
+
+.theme-light .ai-settings-container *:focus-visible {
+  outline-color: #1890ff;
+}

@@ -1,0 +1,217 @@
+/* CSS Variables for Command Explanation Component */
+:root {
+  /* Color Palette */
+  --color-bg-primary: #1e1e2e;
+  --color-bg-secondary: #292c3c;
+  --color-bg-hover: #313244;
+  --color-border: #414558;
+  --color-border-light: #313244;
+  --color-text-primary: #cdd6f4;
+  --color-text-secondary: #bac2de;
+  --color-accent: #94e2d5;
+  --color-highlight: #f5c2e7;
+  --color-info: #89b4fa;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 6px;
+  --spacing-md: 8px;
+  --spacing-lg: 12px;
+  --spacing-xl: 16px;
+  
+  /* Timing */
+  --transition-fast: 150ms;
+  --transition-normal: 250ms;
+}
+
+/* Base Component Styles */
+.command-explanation {
+  margin: var(--spacing-xl) 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  transition: border-color var(--transition-normal) ease;
+}
+
+.command-explanation:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(148, 226, 213, 0.2);
+}
+
+/* Header Styling */
+.explanation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.explanation-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--color-accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.explanation-close {
+  color: var(--color-text-secondary);
+  border: none;
+  padding: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all var(--transition-fast) ease;
+  cursor: pointer;
+  background: transparent;
+}
+
+.explanation-close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
+.explanation-close:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-info);
+}
+
+/* Simple explanation styling */
+.simple-explanation {
+  padding: var(--spacing-md) 0;
+}
+
+.info-icon {
+  color: var(--color-info);
+  margin-right: var(--spacing-md);
+}
+
+/* Ant Design Component Overrides */
+.command-explanation .ant-typography {
+  color: var(--color-text-primary);
+}
+
+.command-explanation .ant-card-head {
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.command-explanation .ant-card-body {
+  background-color: var(--color-bg-primary);
+}
+
+.command-explanation .ant-collapse-content {
+  background-color: transparent;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.ant-card-body {
+  color: var(--color-text-primary);
+}
+/* Structured Content Styling */
+.structured-explanation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.explanation-section h5 {
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-xs);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.explanation-section code {
+  background: var(--color-bg-hover);
+  color: var(--color-highlight);
+  border: none;
+  transition: background-color var(--transition-fast) ease;
+}
+
+.explanation-section code:hover {
+  background: rgba(49, 50, 68, 0.8);
+}
+
+/* Lists Styling */
+.options-list, .examples-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.option-item, .example-item {
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.option-item code, .example-item code {
+  background: var(--color-bg-hover);
+  color: var(--color-highlight);
+  border: none;
+  margin-right: var(--spacing-sm);
+  padding: 2px var(--spacing-sm);
+  border-radius: 3px;
+  transition: background-color var(--transition-fast) ease;
+}
+
+.option-item code:hover, .example-item code:hover {
+  background: rgba(49, 50, 68, 0.8);
+}
+
+/* Loading and Error States */
+.explanation-loading, .explanation-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+}
+
+.explanation-error {
+  color: #f38ba8; /* Error color - could be added to variables */
+}
+
+/* Keyboard Shortcuts Hint */
+.keyboard-shortcut-hint {
+  margin-top: var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.keyboard-key {
+  background: var(--color-bg-hover);
+  padding: 2px var(--spacing-xs);
+  border-radius: 3px;
+  border: 1px solid var(--color-border-light);
+  margin: 0 var(--spacing-xs);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .structured-explanation {
+    gap: var(--spacing-md);
+  }
+  
+  .explanation-section h5 {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .command-explanation {
+    margin: var(--spacing-md) 0;
+  }
+  
+  .explanation-title {
+    font-size: 0.9rem;
+  }
+  
+  .option-item, .example-item {
+    margin-bottom: var(--spacing-md);
+  }
+}

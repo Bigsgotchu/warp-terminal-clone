@@ -2,21 +2,47 @@
   "name": "warp-terminal-clone",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
   "dependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@testing-library/dom": "^9.3.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-search": "^0.15.0",
+    "@xterm/addon-unicode11": "^0.8.0",
+    "@xterm/addon-web-links": "^0.11.0",
+    "@xterm/xterm": "^5.5.0",
+    "antd": "^5.8.6",
+    "axios": "^1.5.0",
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^25.8.4",
+    "electron-builder": "^24.6.3",
+    "electron-store": "^10.0.1",
+    "node-pty": "^0.10.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
     "react-scripts": "5.0.1",
+    "wait-on": "^8.0.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "package": "yarn build && electron-builder build --linux --win --mac",
+    "package:linux": "yarn build && electron-builder build --linux",
+    "package:mac": "yarn build && electron-builder build --mac",
+    "package:win": "yarn build && electron-builder build --win",
+    "rebuild": "electron-rebuild -f -w node-pty",
+    "postinstall": "electron-rebuild",
+    "rebuild:pty": "cd node_modules/node-pty && node-gyp rebuild --target=25.8.4 --arch=x64 --dist-url=https://electronjs.org/headers"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +61,42 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "build": {
+    "appId": "com.opensource.warp-terminal-clone",
+    "productName": "Warp Terminal Clone",
+    "files": [
+      "build/**/*",
+      "main.js",
+      "preload.js",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.2.13",
+    "electron-rebuild": "^3.2.9",
+    "nan": "^2.18.0",
+    "eslint": "^8.47.0"
   }
 }

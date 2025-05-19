@@ -1,0 +1,121 @@
+.tab-manager {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 0 4px;
+}
+
+.tab-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+.custom-tab-bar {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.add-tab-button {
+  margin-left: 4px;
+  color: #ccc;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  height: 32px;
+}
+
+.add-tab-button:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Tab styling */
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+  background-color: #222;
+  border-color: #444;
+  color: #ccc;
+  transition: all 0.3s;
+  margin-right: 2px;
+  border-radius: 4px 4px 0 0;
+  padding: 4px 16px;
+}
+
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
+  background-color: #2c2c2c;
+  border-color: #555;
+  color: #fff;
+}
+
+.ant-tabs-nav::before {
+  border-bottom-color: #333;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover {
+  color: #fff;
+}
+
+.ant-tabs-tab-remove {
+  color: #666;
+  transition: all 0.3s;
+}
+
+.ant-tabs-tab:hover .ant-tabs-tab-remove {
+  color: #ff4d4f;
+}
+
+.tab-title {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+  user-select: none;
+}
+
+/* Processing indicator */
+.tab-processing-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #1890ff;
+  margin-left: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Tab drag and drop */
+.ant-tabs-tab.dragging {
+  opacity: 0.6;
+}
+
+/* Tab dropdown menu */
+.ant-dropdown-menu {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+}
+
+.ant-dropdown-menu-item {
+  color: #ccc;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: #333;
+}
+
+.ant-dropdown-menu-item-disabled {
+  color: #666;
+}
+

@@ -1,70 +1,205 @@
-# Getting Started with Create React App
+# Warp Terminal Clone
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An open-source terminal emulator inspired by Warp, built with Rust, focusing on modern features, AI assistance, and developer productivity.
 
-## Available Scripts
+![Project Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-In the project directory, you can run:
+> **Note**: This project is currently in active development. Features are being implemented incrementally, and the application is not yet ready for production use.
 
-### `npm start`
+## Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This project aims to create an open-source alternative to the Warp terminal with similar features and capabilities. We're building a modern terminal experience that integrates AI assistance, advanced text editing, and a developer-friendly interface.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+### Currently Implemented
+- Basic terminal emulation
+- Command history with improved search
+- Simple theming system
+- Initial keyboard shortcut framework
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### In Development
+- **AI Command Assistance**
+  - Command syntax suggestions
+  - Error explanation and resolution
+  - Context-aware command completion
+  - Natural language to command translation
+- **Enhanced Text Editing**
+  - Block editing and selection
+  - Command blocks with execution controls
+  - Syntax highlighting for shell scripts and common languages
+- **Workflow Improvements**
+  - Command Palette for quick access to terminal functions
+  - Session management with named workspaces
+  - Multiple panes and split views
+- **Integration Capabilities**
+  - Git integration with status indicators
+  - Project-specific configurations and environments
+  - Extensibility via plugins (planned)
 
-### `npm run build`
+## Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
+- Rust 1.70 or newer
+- Cargo package manager
+- Linux, macOS, or Windows with WSL
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### From Source
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/warp-terminal-clone.git
+cd warp-terminal-clone
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Build the project
+cargo build --release
 
-### `npm run eject`
+# Install the binary (optional)
+cargo install --path .
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Package Managers
+> **Note**: Package manager installations are not yet available. They will be added once the project reaches a stable release.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Quick Start
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+After installation, you can launch the terminal with:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+warp-terminal-clone
+```
 
-## Learn More
+### Configuration
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Current configuration options are limited but can be modified in the `~/.config/warp-terminal-clone/config.toml` file:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```toml
+# Example configuration
+[appearance]
+theme = "dark"
+font_size = 14
+font_family = "JetBrains Mono"
 
-### Code Splitting
+[behavior]
+enable_ai_suggestions = true
+autosave_history = true
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Usage Examples
 
-### Analyzing the Bundle Size
+### Basic Terminal Operations
+The terminal supports standard operations you would expect from any terminal emulator:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+# Navigate directories
+cd ~/projects
 
-### Making a Progressive Web App
+# Run commands
+ls -la
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Use pipes and redirections
+cat file.txt | grep "pattern" > results.txt
+```
 
-### Advanced Configuration
+### AI-Assisted Features (In Development)
+```bash
+# Ask for help with a command
+# (Prefix with "?" to activate AI assistance)
+? how to find all files modified in the last 7 days
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Get an explanation for an error
+# (Use "??" after an error occurs)
+some-command-with-error
+?? why did this fail
+```
 
-### Deployment
+### Keyboard Shortcuts
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+T | New tab |
+| Ctrl+W | Close tab |
+| Ctrl+Space | Open command palette |
+| Ctrl+/ | Toggle AI helper |
+| F1 | Show help |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Development Setup
 
-### `npm run build` fails to minify
+### Development Requirements
+- Rust toolchain (rustc, cargo)
+- Development libraries:
+  - On Ubuntu/Debian: `apt install libx11-dev libxcb-shape0-dev libxcb-xfixes0-dev`
+  - On Fedora/RHEL: `dnf install libX11-devel libxcb-devel`
+  - On macOS: `brew install pkg-config`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Building for Development
+```bash
+# Clone repository
+git clone https://github.com/yourusername/warp-terminal-clone.git
+cd warp-terminal-clone
+
+# Set up development environment
+cargo check
+cargo test
+
+# Run in development mode
+cargo run -- --debug
+```
+
+### Project Structure
+```
+src/
+├── ai/          # AI assistance components
+├── terminal/    # Terminal emulation core
+├── ui/          # User interface components
+├── config/      # Configuration handling
+├── commands/    # Command implementation
+└── main.rs      # Application entry point
+```
+
+## Contributing
+
+Contributions are welcome! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
+
+### Getting Started with Contributions
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Style
+We follow the Rust standard formatting guidelines. Please run `cargo fmt` before submitting changes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Screenshots
+
+> **Coming Soon**: Screenshots and GIFs demonstrating key features will be added as they are implemented.
+
+### Terminal Interface
+[placeholder for terminal interface screenshot]
+
+### AI Assistance in Action
+[placeholder for AI assistance demo]
+
+### Multi-pane Workflow
+[placeholder for multi-pane workflow screenshot]
+
+---
+
+## Acknowledgments
+
+- Inspired by [Warp Terminal](https://www.warp.dev/)
+- Built with [Rust](https://www.rust-lang.org/)
+- Uses [crossterm](https://github.com/crossterm-rs/crossterm) for terminal manipulation
+- Leverages [ratatui](https://github.com/ratatui-org/ratatui) for UI components
+
+## Roadmap
+
+See the [open issues](https://github.com/yourusername/warp-terminal-clone/issues) for a list of proposed features and known issues. We're actively working on expanding the AI capabilities and improving terminal performance.
+
+---
+
+**Project Status**: Alpha - Expect breaking changes and incomplete features
